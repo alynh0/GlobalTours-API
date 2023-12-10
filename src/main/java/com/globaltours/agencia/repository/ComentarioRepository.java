@@ -11,5 +11,6 @@ import com.globaltours.agencia.model.Comentario;
 public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
     
     List<Comentario> findByViagemId(Long id);
+    List<Comentario> findByClienteId(Long id);
 
 }

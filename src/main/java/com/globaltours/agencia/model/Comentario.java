@@ -1,5 +1,8 @@
 package com.globaltours.agencia.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -12,14 +15,32 @@ public class Comentario {
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
+    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Cliente cliente;
 
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "viagem_id")
+    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Viagem viagem;
 
-    @Column(columnDefinition = "TEXT", nullable = false, length = 1000)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String texto;
+    
+    public Comentario(Long id, Cliente cliente, Viagem viagem, String texto) {
+        this.id = id;
+        this.cliente = cliente;
+        this.viagem = viagem;
+        this.texto = texto;
+    }
+
+    public Comentario(String texto) {
+        this.texto = texto;
+    }
+
+    public Comentario() {
+    }
 
     
     // Getters e Setters

@@ -36,7 +36,6 @@ public class Viagem {
     public Viagem() {
     }
 
-
     public Viagem(Long id, String origem, String destino, LocalDate dataIda, LocalDate dataVolta, float preco,
             String descricao, List<Comentario> comentarios) {
         this.id = id;

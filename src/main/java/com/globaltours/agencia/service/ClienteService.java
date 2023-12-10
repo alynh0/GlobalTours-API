@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.globaltours.agencia.model.Cliente;
 import com.globaltours.agencia.model.Comentario;
+import com.globaltours.agencia.model.Viagem;
 import com.globaltours.agencia.repository.ClienteRepository;
 import com.globaltours.agencia.repository.ComentarioRepository;
+import com.globaltours.agencia.repository.ViagemRepository;
 
 @Service
 public class ClienteService {
@@ -19,6 +21,9 @@ public class ClienteService {
 
     @Autowired
     ComentarioRepository comentarioRepository;
+
+    @Autowired
+    ViagemRepository viagemRepository;
 
     public ClienteService(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
@@ -72,19 +77,44 @@ public class ClienteService {
         }
     }
 
-    public Comentario publicarComentario(Long id, Comentario comentario) {
+    // public Comentario publicarComentario(Long id, Comentario comentario) {
+    //     try {
+    //         Optional<Cliente> cliente = clienteRepository.findById(id);
+    //         if (cliente.isPresent()) {
+    //             comentario.setCliente(cliente.get());
+    //             return comentarioRepository.save(comentario);
+    //         } else {
+    //             return null;
+    //         }
+    //     } catch (Exception e) {
+    //         throw new RuntimeException("Erro ao publicar comentário", e);
+    //     }
+    // }
+
+    public Comentario publicarComentario(Long clienteID, Comentario comentario, Long viagemID) {
         try {
-            Optional<Cliente> cliente = clienteRepository.findById(id);
+            Optional<Cliente> cliente = clienteRepository.findById(clienteID);
             if (cliente.isPresent()) {
                 comentario.setCliente(cliente.get());
-                return comentarioRepository.save(comentario);
-            } else {
+                Optional<Viagem> viagem = viagemRepository.findById(viagemID);
+                if (viagem.isPresent()) {
+                    comentario.setViagem(viagem.get());
+                    comentarioRepository.save(comentario);
+                    viagem.get().getComentarios().add(comentario);
+                    viagemRepository.save(viagem.get());
+                    return comentario;
+                } else {
+                    return null;
+                }
+            }
+            else {
                 return null;
             }
         } catch (Exception e) {
             throw new RuntimeException("Erro ao publicar comentário", e);
         }
     }
+
 
     public void deletarComentario(Long id) {
         try {

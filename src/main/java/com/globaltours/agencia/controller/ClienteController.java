@@ -19,6 +19,7 @@ import com.globaltours.agencia.model.Cliente;
 import com.globaltours.agencia.model.Comentario;
 import com.globaltours.agencia.model.Viagem;
 import com.globaltours.agencia.service.ClienteService;
+import com.globaltours.agencia.service.ComentarioService;
 import com.globaltours.agencia.service.ViagemService;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -32,6 +33,9 @@ public class ClienteController {
 
     @Autowired
     ViagemService viagemService;
+
+    @Autowired
+    ComentarioService comentarioService;
 
     @GetMapping("/listar")
     public List<Cliente> listarClientes() {
@@ -86,46 +90,45 @@ public class ClienteController {
         }
     }
 
-    @GetMapping("/{id}/comentarios")
-    public ResponseEntity<?> listarComentarios(@PathVariable Long id, @RequestParam(required = false) Long viagemID) {
+    // @GetMapping("/{id}/comentarios")
+    // public ResponseEntity<?> listarComentarios(@PathVariable Long id, @RequestParam Long viagemID) {
 
-        Optional<Cliente> cliente = clienteService.buscarCliente(id);
-        if (cliente.isPresent()) {
-            if (viagemID != null) {
-                Optional<Viagem> viagem = viagemService.buscarViagem(viagemID);
-                if (viagem.isPresent()) {
-                    return ResponseEntity.ok(viagem.get().getComentarios());
-                } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Viagem não encontrada");
-                }
-            } else {
-                return ResponseEntity.ok(cliente.get().getComentarios());
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente não encontrado");
-        }
+    //     Optional<Cliente> cliente = clienteService.buscarCliente(id);
+    //     if (cliente.isPresent()) {
+    //         if (viagemID != null) {
+    //             Optional<Viagem> viagem = viagemService.buscarViagem(viagemID);
+    //             if (viagem.isPresent()) {
 
-    }
+    //                 return ResponseEntity.ok();
+    //             } else {
+    //                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Viagem não encontrada");
+    //             }
+    //         } else {
+    //             return ResponseEntity.ok(cliente.get().getComentarios());
+    //         }
+    //     } else {
+    //         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente não encontrado");
+    //     }
 
-    @PostMapping("/{id}/comentar")
-    public ResponseEntity<?> adicionarComentario(@PathVariable Long clienteID, @RequestBody Comentario comentario) {
+    // }
+
+    @PostMapping("/comentar/{viagemID}")
+    public ResponseEntity<?> adicionarComentario(@PathVariable Long viagemID, @RequestBody Comentario comentario, @RequestParam Long clienteID) {
 
         Optional<Cliente> cliente = clienteService.buscarCliente(clienteID);
-        if (cliente.isPresent()) {
-            Optional<Viagem> viagem = viagemService.buscarViagem(comentario.getViagem().getId());
-            if (viagem.isPresent()) {
-                Comentario novoComentario = clienteService.publicarComentario(clienteID, comentario);
-                cliente.get().getComentarios().add(novoComentario);
-                viagem.get().getComentarios().add(novoComentario);
-                viagemService.atualizarViagem(viagem.get().getId(), viagem.get());
-                clienteService.atualizarCliente(clienteID, cliente.get()); // alterada
-                return ResponseEntity.status(HttpStatus.CREATED).body(novoComentario);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Viagem não encontrada");
-            }
+        Optional<Viagem> viagem = viagemService.buscarViagem(viagemID);
+
+        if (cliente.isPresent() && viagem.isPresent()) {
+            comentario.setCliente(cliente.get());
+            comentario.setViagem(viagem.get());
+            System.out.println("Comentário: " + comentario);
+            comentarioService.salvarComentario(comentario);
+            return ResponseEntity.status(HttpStatus.CREATED).body(comentario);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente não encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+
     }
+
 
 }
