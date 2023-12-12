@@ -29,7 +29,10 @@ public class Cliente {
     
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comentario> comentarios;
-    
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reserva> reservas;
+
     // Construtores
     public Cliente() {
     }
@@ -98,5 +101,13 @@ public class Cliente {
 
     public void setComentarios(List<Comentario> comentarios) {
         this.comentarios = comentarios;
+    }
+
+    public List<Reserva> getReservas() {
+        return reservas;
+    }
+    
+    public void setReservas(List<Reserva> reservas) {
+        this.reservas = reservas;
     }
 }
