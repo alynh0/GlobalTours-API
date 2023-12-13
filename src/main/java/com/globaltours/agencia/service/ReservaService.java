@@ -32,11 +32,11 @@ public class ReservaService {
         }
     }
 
-    public Reserva salvarReserva(Reserva reserva) {
+    public Reserva criarReserva(Reserva reserva) {
         try {
             return reservaRepository.save(reserva);
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao salvar reserva", e);
+            throw new RuntimeException("Erro ao criar reserva", e);
         }
     }
 

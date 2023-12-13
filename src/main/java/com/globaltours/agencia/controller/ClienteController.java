@@ -3,7 +3,6 @@ package com.globaltours.agencia.controller;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,29 +12,33 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.globaltours.agencia.model.Cliente;
 import com.globaltours.agencia.model.Comentario;
+import com.globaltours.agencia.model.Reserva;
 import com.globaltours.agencia.model.Viagem;
 import com.globaltours.agencia.service.ClienteService;
 import com.globaltours.agencia.service.ComentarioService;
+import com.globaltours.agencia.service.ReservaService;
 import com.globaltours.agencia.service.ViagemService;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @RestController
 @RequestMapping("/cliente")
 public class ClienteController {
     
-    @Autowired
-    ClienteService clienteService;
+    private final ReservaService reservaService;
+    private final ClienteService clienteService;
+    private final ViagemService viagemService;
+    private final ComentarioService comentarioService;
 
-    @Autowired
-    ViagemService viagemService;
-
-    @Autowired
-    ComentarioService comentarioService;
+    public ClienteController(ReservaService reservaService, ClienteService clienteService, ViagemService viagemService, ComentarioService comentarioService) {
+        this.reservaService = reservaService;
+        this.clienteService = clienteService;
+        this.viagemService = viagemService;
+        this.comentarioService = comentarioService;
+    }
 
     @GetMapping("/listar")
     public List<Cliente> listarClientes() {
@@ -90,6 +93,8 @@ public class ClienteController {
         }
     }
 
+    // ENDPOINTS DE COMENTÁRIOS
+
     // @GetMapping("/{id}/comentarios")
     // public ResponseEntity<?> listarComentarios(@PathVariable Long id, @RequestParam Long viagemID) {
 
@@ -128,6 +133,44 @@ public class ClienteController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
+    }
+
+    // ENDPOINTS DE RESERVAS
+
+    @GetMapping("/{id}/reservas")
+    public ResponseEntity<?> listarReservas(@PathVariable Long id) {
+        try {
+            Optional<Cliente> cliente = clienteService.buscarCliente(id);
+            if (cliente.isPresent()) {
+                List<Reserva> reservas = reservaService.listarReservasPorCliente(id);
+                return ResponseEntity.status(HttpStatus.OK).body(reservas);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente não encontrado");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/adicionar-reserva/{clienteId}")
+    public ResponseEntity<?> adicionarReserva(@PathVariable Long clienteId, @RequestParam Long viagemId, @RequestBody Reserva reserva) {
+        try {
+            Optional<Cliente> cliente = clienteService.buscarCliente(clienteId);
+            Optional<Viagem> viagem = viagemService.buscarViagem(viagemId);
+
+            if (cliente.isPresent() && viagem.isPresent()) {
+                reserva.setCliente(cliente.get());
+                reserva.setViagem(viagem.get());
+                reserva.setDataReserva(reserva.getDataReserva());
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            Reserva novaReserva = reservaService.criarReserva(reserva);
+            return ResponseEntity.status(HttpStatus.CREATED).body(novaReserva);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
 

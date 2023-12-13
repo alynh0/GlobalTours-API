@@ -3,6 +3,9 @@ package com.globaltours.agencia.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "reservas")
 public class Reserva {
@@ -13,13 +16,16 @@ public class Reserva {
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
+    @JsonIgnore
     private Cliente cliente;
 
     @ManyToOne
     @JoinColumn(name = "viagem_id")
+    @JsonIgnore
     private Viagem viagem;
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataReserva;
 
     public Reserva() {
@@ -33,9 +39,17 @@ public class Reserva {
         this.dataReserva = dataReserva;
     }
 
+    public Reserva(Viagem viagem, LocalDate dataReserva) {
+        validarDataReserva(dataReserva, viagem.getDataIda(), viagem.getDataVolta());
+
+        this.viagem = viagem;
+        this.dataReserva = dataReserva;
+    }
+
+    // Valida se a data da reserva está entre a data de início e fim da viagem
     private void validarDataReserva(LocalDate dataReserva, LocalDate dataIda, LocalDate dataVolta) {
-        if (dataReserva.isBefore(dataIda) || dataReserva.isAfter(dataVolta)) {
-            throw new IllegalArgumentException("A data da reserva deve estar entre a data de início e fim da viagem.");
+        if (dataReserva.isBefore(dataIda.minusDays(1))) {
+            throw new IllegalArgumentException("A data da reserva deve ser anterior à data de ida da viagem");
         }
     }
 
