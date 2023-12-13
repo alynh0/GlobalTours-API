@@ -77,20 +77,6 @@ public class ClienteService {
         }
     }
 
-    // public Comentario publicarComentario(Long id, Comentario comentario) {
-    //     try {
-    //         Optional<Cliente> cliente = clienteRepository.findById(id);
-    //         if (cliente.isPresent()) {
-    //             comentario.setCliente(cliente.get());
-    //             return comentarioRepository.save(comentario);
-    //         } else {
-    //             return null;
-    //         }
-    //     } catch (Exception e) {
-    //         throw new RuntimeException("Erro ao publicar comentário", e);
-    //     }
-    // }
-
     public Comentario publicarComentario(Long clienteID, Comentario comentario, Long viagemID) {
         try {
             Optional<Cliente> cliente = clienteRepository.findById(clienteID);
