@@ -94,29 +94,6 @@ public class ClienteController {
     }
 
     // ENDPOINTS DE COMENTÁRIOS
-
-    // @GetMapping("/{id}/comentarios")
-    // public ResponseEntity<?> listarComentarios(@PathVariable Long id, @RequestParam Long viagemID) {
-
-    //     Optional<Cliente> cliente = clienteService.buscarCliente(id);
-    //     if (cliente.isPresent()) {
-    //         if (viagemID != null) {
-    //             Optional<Viagem> viagem = viagemService.buscarViagem(viagemID);
-    //             if (viagem.isPresent()) {
-
-    //                 return ResponseEntity.ok();
-    //             } else {
-    //                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Viagem não encontrada");
-    //             }
-    //         } else {
-    //             return ResponseEntity.ok(cliente.get().getComentarios());
-    //         }
-    //     } else {
-    //         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente não encontrado");
-    //     }
-
-    // }
-
     @PostMapping("/comentar/{viagemID}")
     public ResponseEntity<?> adicionarComentario(@PathVariable Long viagemID, @RequestBody Comentario comentario, @RequestParam Long clienteID) {
 
@@ -136,7 +113,6 @@ public class ClienteController {
     }
 
     // ENDPOINTS DE RESERVAS
-
     @GetMapping("/{id}/reservas")
     public ResponseEntity<?> listarReservas(@PathVariable Long id) {
         try {
