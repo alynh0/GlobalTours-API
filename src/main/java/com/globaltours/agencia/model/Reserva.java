@@ -32,25 +32,14 @@ public class Reserva {
     }
 
     public Reserva(Cliente cliente, Viagem viagem, LocalDate dataReserva) {
-        validarDataReserva(dataReserva, viagem.getDataIda(), viagem.getDataVolta());
-
         this.cliente = cliente;
         this.viagem = viagem;
         this.dataReserva = dataReserva;
     }
 
     public Reserva(Viagem viagem, LocalDate dataReserva) {
-        validarDataReserva(dataReserva, viagem.getDataIda(), viagem.getDataVolta());
-
         this.viagem = viagem;
         this.dataReserva = dataReserva;
-    }
-
-    // Valida se a data da reserva está entre a data de início e fim da viagem
-    private void validarDataReserva(LocalDate dataReserva, LocalDate dataIda, LocalDate dataVolta) {
-        if (dataReserva.isBefore(dataIda.minusDays(1))) {
-            throw new IllegalArgumentException("A data da reserva deve ser anterior à data de ida da viagem");
-        }
     }
 
     public Long getId() {

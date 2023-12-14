@@ -142,8 +142,13 @@ public class ClienteController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
 
-            Reserva novaReserva = reservaService.criarReserva(reserva);
-            return ResponseEntity.status(HttpStatus.CREATED).body(novaReserva);
+            // VERIFICA SE A DATA DA RESERVA É PELO MENOS UM DIA ANTES DA DATA DE IDA DA VIAGEM
+            if (reserva.getDataReserva().isBefore(viagem.get().getDataIda().minusDays(1))) {
+                Reserva novaReserva = reservaService.criarReserva(reserva);
+                return ResponseEntity.status(HttpStatus.CREATED).body(novaReserva);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data da reserva deve ser pelo menos um dia antes da data de ida da viagem");
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
